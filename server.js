@@ -1,16 +1,16 @@
-var express = require('express');
-var port = process.env.PORT || 3000;
-var app = express();
+const express = require("express");
+const port = process.env.PORT || 3000;
+const app = express();
 
-app.get('/', function(req, res) {
+app.get("/", (req, res) => {
   res.send({
-    "Output" : "Hello World!"
+    Output: "Hello World! Test!!"
   });
 });
 
-app.post('/', function(req, res) {
+app.post("/", (req, res) => {
   res.send({
-    "Output" : "Hello World!"
+    Output: "Hello World!"
   });
 });
 
