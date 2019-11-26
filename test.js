@@ -1,10 +1,101 @@
-var AWS = require("aws-sdk");
+const paywall = [
+  "https://www.delfi.ee/news/paevauudised/paevaleht/delfi-strasbourgis-sentsov-mina-ei-usalda-putinit-ja-kutsun-teid-sama-tegema?id=88184105",
+  "https://epl.delfi.ee/arvamus/proviisorid-marika-tuus-laulile-tunneme-end-solvatuna-millises-inforuumis-autor-kull-elab?id=88181233",
+  "https://epl.delfi.ee/arvamus/proviisorid-marika-tuus-laulile-tunneme-end-solvatuna-millises-inforuumis-autor-kull-elab?id=88181233&com=1",
+  "https://lood.delfi.ee/perejakodu/koolilaps/kui-koht-jalle-valutama-hakkab-poorduge-emosse-oli-perearsti-ainus-soovitus-lopuks-selgus-et-lapsel-on-maksalutikad?id=88147999",
+  "https://lood.delfi.ee/perejakodu/peresuhted/advokaat-karin-ploom-lahkuminejatele-olen-siiralt-seda-meelt-et-lapsele-peab-alles-jaama-kaks-vanemat-kes-molemad-lapse-eest-ka-vastutavad?id=88007421",
+  "https://lood.delfi.ee/perejakodu/ajakirjalood/me-ei-votnud-poega-vanaisa-matustele-kaasa-nuud-kusib-ta-emme-kus-vanaisa-on?id=88140161",
+  "https://arileht.delfi.ee/news/uudised/wolti-baltimaade-juht-utlen-ausalt-mulle-meeldib-raha?id=88136201",
+  "https://arileht.delfi.ee/news/uudised/kahel-turul-suured-plaanid-astri-grupp-sai-noorte-osanike-lisandudes-tuult-tiibadesse?id=88155153",
+  "https://epl.delfi.ee/arvamus/oudekki-loone-valimistel-on-tagajarjed-kui-lemetti-koostood-ei-soovinudki-oli-aeg-minna?id=88177355",
+  "https://epl.delfi.ee/arvamus/oudekki-loone-valimistel-on-tagajarjed-kui-lemetti-koostood-ei-soovinudki-oli-aeg-minna?id=88177355&com=1",
+  "https://epl.delfi.ee/arvamus/karmen-turk-villu-otsmann-vaba-sona-on-voitlust-vaart?id=88168139",
+  "https://epl.delfi.ee/arvamus/karmen-turk-villu-otsmann-vaba-sona-on-voitlust-vaart?id=88168139&com=1",
+  "https://lood.delfi.ee/omamaitse/retseptid/retsept-kodused-kotletid-kartuli-kaalikatambiga?id=88187069",
+  "https://epl.delfi.ee/uudised/valitsuse-tank-rullus-taiskaigul-ule-ausa-tippametniku?id=88172327",
+  "https://epl.delfi.ee/uudised/valitsuse-tank-rullus-taiskaigul-ule-ausa-tippametniku?id=88172327&com=1",
+  "https://kroonika.delfi.ee/news/kroonika/kroonika-eksklusiiv-tbilisist-oleg-ossinovski-naitab-uhket-villat-mida-suurem-on-isiksus-seda-rohkem-peab-ta-tootama?id=88176969",
+  "https://epl.delfi.ee/valismaa/merkel-macronile-olen-teie-tekitatud-segaduse-koristamisest-tudinenud?id=88169139",
+  "https://epl.delfi.ee/valismaa/merkel-macronile-olen-teie-tekitatud-segaduse-koristamisest-tudinenud?id=88169139&com=1",
+  "https://www.delfi.ee/a/88064933",
+  "https://www.delfi.ee/a/87980679",
+  "https://www.delfi.ee/a/88007421",
+  "https://www.delfi.ee/a/88107923",
+  "https://www.delfi.ee/a/88158179",
+  "https://www.delfi.ee/a/88153883",
+  "https://www.delfi.ee/a/88150789",
+  "https://www.delfi.ee/a/88064471",
+  "https://www.delfi.ee/a/88064393",
+  "https://www.delfi.ee/a/88174409",
+  "https://www.delfi.ee/a/84256321",
+  "https://www.delfi.ee/a/88187069",
+  "https://www.delfi.ee/a/88182847",
+  "https://www.delfi.ee/a/88174775",
+  "https://www.delfi.ee/a/87480879",
+  "https://www.delfi.ee/a/87410481",
+  "https://www.delfi.ee/a/87356693",
+  "https://www.delfi.ee/a/87342167",
+  "https://www.delfi.ee/a/87376229",
+  "https://tv.delfi.ee/uudised/epl/fotod-ja-videod-paljassaare-filmilinnaku-trumbiks-saab-viiekorruselise-maja-korgune-stuudio?id=88169929",
+  "https://digileht.eestinaine.delfi.ee/elud/kaanelugu-age-paikesekiir-ja-maailm?id=88064933",
+  "https://epl.delfi.ee/uudised/korteri-uurinud-nato-tootaja-pages-ja-jattis-maha-kaose?id=88158771",
+  "https://epl.delfi.ee/uudised/korteri-uurinud-nato-tootaja-pages-ja-jattis-maha-kaose?id=88158771&com=1&reg=1",
+  "https://arileht.delfi.ee/news/uudised/eesti-ja-ukraina-presidentide-kohtumisel-tootab-uheks-pohiteemaks-kujuneda-taaskord-sealse-arikeskkonna-olukord-ehk-hillar-tederi-arimure?id=88165911",
+  "https://epl.delfi.ee/valismaa/merkel-macronile-olen-teie-tekitatud-segaduse-koristamisest-tudinenud?id=88169139&com=1&reg=1",
+  "https://www.delfi.ee/news/paevauudised/valismaa/suur-lugu-paradiisi-lopp-saksa-bordellikuninga-kiire-tee-tippu-ja-jarsk-allakaik?id=88146197",
+  "https://sport.delfi.ee/news/suusatamine/murdmaasuusatamine/petturite-pidu-pulbermaarded-keelustatakse-kuid-kasutamist-kontrollida-ei-osata?id=88169141",
+  "https://sport.delfi.ee/news/suusatamine/eesti/alusalu-uued-reeglid-on-uhisstardiga-soitu-muutnud?id=88172613",
+  "https://lood.delfi.ee/omamaitse/toidutrendid/hormoonsusteem-on-orn-ja-tundlik-mojutades-otseselt-meie-immuunsusteemi-kuidas-toit-seda-koike-mojutab?id=88182847",
+  "https://lood.delfi.ee/omamaitse/toidutrendid/anname-mannale-voimaluse-teeme-mannavormi-kohupiimaga?id=88174775",
+  "https://epl.delfi.ee/lp/mojukad-david-vseviov-koht-on-inimese-koige-olulisem-kehaosa?id=88094999",
+  "https://epl.delfi.ee/lp/mojukad-david-vseviov-koht-on-inimese-koige-olulisem-kehaosa?id=88094999&com=1",
+  "https://epl.delfi.ee/lp/mojukad-ott-tanak-toestab-et-oige-eesti-mees-on-pariselt-olemas?id=88097517",
+  "https://epl.delfi.ee/lp/mojukad-ott-tanak-toestab-et-oige-eesti-mees-on-pariselt-olemas?id=88097517&com=1",
+  "https://epl.delfi.ee/kultuur/mojukad-tanel-toom-viis-andrese-ja-pearu-laia-maailma?id=88116279",
+  "https://epl.delfi.ee/kultuur/mojukad-tanel-toom-viis-andrese-ja-pearu-laia-maailma?id=88116279&com=1",
+  "https://ekspress.delfi.ee/erid/nopri-talu-peremees-valitsuse-poliitiline-tahe-maaelu-osas-on-seniolematult-suur?id=87732323",
+  "https://ekspress.delfi.ee/erid/nopri-talu-peremees-valitsuse-poliitiline-tahe-maaelu-osas-on-seniolematult-suur?id=87732323&com=1",
+  "https://ekspress.delfi.ee/areen/lugu-tudrukust-keda-enam-pole?id=88101705",
+  "https://lood.delfi.ee/maakodu/news/maakodu/retseptid/retseptid-romantiline-ohtusook-kahele-mida-lauale-panna?id=88108599",
+  "https://lood.delfi.ee/maakodu/news/maakodu/aed/porrulauk-ja-tema-sugulased-vaarivad-supertoidu-staatust?id=88107923",
+  "https://lood.delfi.ee/maakodu/news/maakodu/kodu/kas-teadsid-et-kardinaga-saab-aknad-suuremaks-teha?id=88110679",
+  "https://naistekas.delfi.ee/suhted/seks/eksperiment-kaisin-epp-karsini-lingam-massaazi-koolitusel-ja?id=88130939",
+  "https://lood.delfi.ee/perejakodu/ajakirjalood/korbekuumuses-elust-parimat-vottes?id=88147995",
+  "https://lood.delfi.ee/perejakodu/ajakirjalood/raseduskilod-ei-kao-mine-trenni-ja-vota-beebi-hantliks?id=84256321",
+  "https://tv.delfi.ee/uudised/epl/fotod-ja-videod-paljassaare-filmilinnaku-trumbiks-saab-viiekorruselise-maja-korgune-stuudio?id=88169929",
+  "https://digileht.eestinaine.delfi.ee/elud/kaanelugu-age-paikesekiir-ja-maailm?id=88064933",
+  "https://epl.delfi.ee/uudised/korteri-uurinud-nato-tootaja-pages-ja-jattis-maha-kaose?id=88158771",
+  "https://epl.delfi.ee/uudised/korteri-uurinud-nato-tootaja-pages-ja-jattis-maha-kaose?id=88158771&com=1&reg=1",
+  "https://arileht.delfi.ee/news/uudised/eesti-ja-ukraina-presidentide-kohtumisel-tootab-uheks-pohiteemaks-kujuneda-taaskord-sealse-arikeskkonna-olukord-ehk-hillar-tederi-arimure?id=88165911",
+  "https://epl.delfi.ee/valismaa/merkel-macronile-olen-teie-tekitatud-segaduse-koristamisest-tudinenud?id=88169139&com=1&reg=1",
+  "https://www.delfi.ee/news/paevauudised/valismaa/suur-lugu-paradiisi-lopp-saksa-bordellikuninga-kiire-tee-tippu-ja-jarsk-allakaik?id=88146197",
+  "https://sport.delfi.ee/news/suusatamine/murdmaasuusatamine/petturite-pidu-pulbermaarded-keelustatakse-kuid-kasutamist-kontrollida-ei-osata?id=88169141",
+  "https://sport.delfi.ee/news/suusatamine/eesti/alusalu-uued-reeglid-on-uhisstardiga-soitu-muutnud?id=88172613",
+  "https://lood.delfi.ee/omamaitse/toidutrendid/hormoonsusteem-on-orn-ja-tundlik-mojutades-otseselt-meie-immuunsusteemi-kuidas-toit-seda-koike-mojutab?id=88182847",
+  "https://lood.delfi.ee/omamaitse/toidutrendid/anname-mannale-voimaluse-teeme-mannavormi-kohupiimaga?id=88174775",
+  "https://epl.delfi.ee/lp/mojukad-david-vseviov-koht-on-inimese-koige-olulisem-kehaosa?id=88094999",
+  "https://epl.delfi.ee/lp/mojukad-david-vseviov-koht-on-inimese-koige-olulisem-kehaosa?id=88094999&com=1",
+  "https://epl.delfi.ee/lp/mojukad-ott-tanak-toestab-et-oige-eesti-mees-on-pariselt-olemas?id=88097517",
+  "https://epl.delfi.ee/lp/mojukad-ott-tanak-toestab-et-oige-eesti-mees-on-pariselt-olemas?id=88097517&com=1",
+  "https://epl.delfi.ee/kultuur/mojukad-tanel-toom-viis-andrese-ja-pearu-laia-maailma?id=88116279",
+  "https://epl.delfi.ee/kultuur/mojukad-tanel-toom-viis-andrese-ja-pearu-laia-maailma?id=88116279&com=1",
+  "https://ekspress.delfi.ee/erid/nopri-talu-peremees-valitsuse-poliitiline-tahe-maaelu-osas-on-seniolematult-suur?id=87732323",
+  "https://ekspress.delfi.ee/erid/nopri-talu-peremees-valitsuse-poliitiline-tahe-maaelu-osas-on-seniolematult-suur?id=87732323&com=1",
+  "https://ekspress.delfi.ee/areen/lugu-tudrukust-keda-enam-pole?id=88101705",
+  "https://lood.delfi.ee/maakodu/news/maakodu/retseptid/retseptid-romantiline-ohtusook-kahele-mida-lauale-panna?id=88108599",
+  "https://lood.delfi.ee/maakodu/news/maakodu/aed/porrulauk-ja-tema-sugulased-vaarivad-supertoidu-staatust?id=88107923",
+  "https://lood.delfi.ee/maakodu/news/maakodu/kodu/kas-teadsid-et-kardinaga-saab-aknad-suuremaks-teha?id=88110679",
+  "https://naistekas.delfi.ee/suhted/seks/eksperiment-kaisin-epp-karsini-lingam-massaazi-koolitusel-ja?id=88130939",
+  "https://lood.delfi.ee/perejakodu/ajakirjalood/korbekuumuses-elust-parimat-vottes?id=88147995",
+  "https://lood.delfi.ee/perejakodu/ajakirjalood/raseduskilod-ei-kao-mine-trenni-ja-vota-beebi-hantliks?id=84256321"
+];
 
-AWS.config.getCredentials(function(err) {
-  if (err) console.log(err.stack);
-  // credentials not loaded
-  else {
-    console.log("Access key:", AWS.config.credentials.accessKeyId);
-    console.log("Secret access key:", AWS.config.credentials.secretAccessKey);
-  }
-});
+const uniqueLinks = [...new Map(array.map(item => [item.url, item])).values()];
+
+const newInnerLinks = uniqueLinks.filter(
+  item => savedLinks.map(link => link.url).indexOf(item.url) == -1
+);
+
+console.log(uniqueLinks.length);
+console.log(savedLinks.length);
+console.log(newInnerLinks.length);
