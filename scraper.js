@@ -54,6 +54,7 @@ let seenLinks = [];
           paywall: await axios
             .get(url)
             .then(response =>
+              // Test if link is paywalled with regex
               /pyfe-overlay|paywall-component="paywall"|class="paywall-container"/g.test(
                 response.data
               )
