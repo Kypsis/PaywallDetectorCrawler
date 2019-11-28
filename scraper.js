@@ -1,5 +1,9 @@
 const puppeteer = require("puppeteer");
 const axios = require("axios");
+AWS.config.loadFromPath("./config.json");
+//AWS.config.update({ region: "eu-central-1" });
+
+const docClient = new AWS.DynamoDB.DocumentClient();
 
 async function autoScroll(page) {
   await page.evaluate(async () => {
@@ -20,9 +24,22 @@ async function autoScroll(page) {
   });
 }
 
-let seenLinks = [];
-
 (async () => {
+  let seenLinks = [];
+
+  try {
+    docClient
+      .scan({
+        TableName: "PaywallLinks"
+      })
+      .eachPage((err, data, done) => {
+        seenLinks = data.Items;
+        //done();
+      });
+  } catch (error) {
+    null;
+  }
+
   try {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -59,7 +76,8 @@ let seenLinks = [];
                 response.data
               )
             )
-            .catch(error => null)
+            .catch(error => null),
+          TTL: Math.round(Date.now() / 1000) + 604800
         };
       })
     )
