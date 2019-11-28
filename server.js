@@ -1,14 +1,25 @@
 const express = require("express");
-const port = process.env.PORT || 3000;
 const app = express();
 const AWS = require("aws-sdk");
+const scraper = require("./scraper");
 
-AWS.config.loadFromPath("./config.json");
-//AWS.config.update({ region: "eu-central-1" });
+const port = process.env.PORT || 3000;
+
+//AWS.config.loadFromPath("./config.json");
+AWS.config.update({ region: "eu-central-1" });
 
 const docClient = new AWS.DynamoDB.DocumentClient();
 
-// Call DynamoDB to read the item from the table
+// Scrape Delfi and Postimees every 5-7 minutes
+setInterval(() => {
+  scraper("https://delfi.ee", "DelfiPaywallLinks");
+  console.log("Scraping Delfi ", new Date());
+}, 300000 + Math.floor(Math.random() * 120000));
+
+setInterval(() => {
+  scraper("https://postimees.ee", "PostimeesPaywallLinks");
+  console.log("Scraping Postimees ", new Date());
+}, 300000 + Math.floor(Math.random() * 120000));
 
 app.get("/delfi", (req, res) => {
   try {
