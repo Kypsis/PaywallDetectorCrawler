@@ -24,8 +24,8 @@ var params = {
   TableName: "PaywallLinks",
   Item: {
     Links: "https://delfi.ee/sussid",
-    Paywalled: true,
-    TTL: ttl
+    Paywalled: true
+    //TTL: ttl
   }
 };
 
