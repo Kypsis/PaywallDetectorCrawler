@@ -1,5 +1,7 @@
 const puppeteer = require("puppeteer");
 const axios = require("axios");
+const AWS = require("aws-sdk");
+
 AWS.config.loadFromPath("./config.json");
 //AWS.config.update({ region: "eu-central-1" });
 
@@ -9,7 +11,7 @@ async function autoScroll(page) {
   await page.evaluate(async () => {
     await new Promise((resolve, reject) => {
       let totalHeight = 0;
-      const distance = 500;
+      const distance = 300;
       const timer = setInterval(() => {
         const scrollHeight = document.body.scrollHeight;
         window.scrollBy(0, distance);
@@ -19,18 +21,18 @@ async function autoScroll(page) {
           clearInterval(timer);
           resolve();
         }
-      }, 50);
+      }, 100);
     });
   });
 }
 
-(async () => {
+const scraper = async () => {
   let seenLinks = [];
 
   try {
     docClient
       .scan({
-        TableName: "PaywallLinks"
+        TableName: "DelfiPaywallLinks"
       })
       .eachPage((err, data, done) => {
         seenLinks = data.Items;
@@ -59,16 +61,19 @@ async function autoScroll(page) {
         )
     );
     const uniqueLinks = [...new Set(mainHrefs)];
+    console.log("Unique links on mainpage: ", uniqueLinks.length);
+
     const newLinks = uniqueLinks.filter(
-      item => seenLinks.map(link => link.url).indexOf(item.url) == -1
+      item => seenLinks.map(link => link.Url).indexOf(item) == -1
     );
+    console.log("Previously seen links: ", seenLinks.length);
     console.log("New links: ", newLinks.length);
 
     Promise.all(
       newLinks.map(async url => {
         return {
-          url: url,
-          paywall: await axios
+          Url: url,
+          Paywalled: await axios
             .get(url)
             .then(response =>
               // Test if link is paywalled with regex
@@ -81,11 +86,26 @@ async function autoScroll(page) {
         };
       })
     )
-      .then(results => {
+      .then(async results => {
         seenLinks.push(...results);
+        await results.forEach(link => {
+          docClient.put(
+            {
+              TableName: "DelfiPaywallLinks",
+              Item: link
+            },
+            (err, data) => {
+              if (err) {
+                console.log("Error");
+              } else {
+                console.log("Success");
+              }
+            }
+          );
+        });
         console.log(
           "Paywalled links: ",
-          seenLinks.filter(link => link.paywall === true).length
+          seenLinks.filter(link => link.Paywalled === true).length
         );
       })
       .catch(err => null);
@@ -94,4 +114,6 @@ async function autoScroll(page) {
   } catch (error) {
     console.log(error);
   }
-})();
+};
+
+scraper();
