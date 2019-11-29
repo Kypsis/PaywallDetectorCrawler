@@ -6,6 +6,6 @@ scrapes roughly 10 new links every 5-7 minutes. Written in Node and utilizing AW
 
 ## Endpoints
 
-http://ec2-3-123-26-209.eu-central-1.compute.amazonaws.com/delfi
+http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/delfi
 
-http://ec2-3-123-26-209.eu-central-1.compute.amazonaws.com//postimees
+http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/postimees
