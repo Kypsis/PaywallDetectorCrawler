@@ -119,10 +119,11 @@ const scraper = async (pageToScrape, tableName) => {
           seenLinks.filter(link => link.Paywalled === true).length
         );
       })
-      .catch(err => null);
+      .catch(err => await browser.close());
 
     await browser.close();
   } catch (error) {
+    await browser.close();
     console.log(error);
   }
 };
