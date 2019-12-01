@@ -67,6 +67,11 @@ const scraper = async (pageToScrape, tableName) => {
           )
         )
     );
+
+    // Important that browser.close() is above Promise.all block to avoid zombie
+    // browsers crashing server
+    await browser.close();
+
     const uniqueLinks = [...new Set(mainHrefs)];
     console.log("Unique links on mainpage: ", uniqueLinks.length);
 
@@ -122,8 +127,6 @@ const scraper = async (pageToScrape, tableName) => {
       .catch(async err => null);
   } catch (error) {
     console.log(error);
-  } finally {
-    await browser.close();
   }
 };
 
