@@ -22,7 +22,7 @@ async function autoScroll(page) {
           clearInterval(timer);
           resolve();
         }
-      }, 100);
+      }, 50);
     });
   });
 }
@@ -123,9 +123,11 @@ const scraper = async (pageToScrape, tableName) => {
           "Paywalled links: ",
           seenLinks.filter(link => link.Paywalled === true).length
         );
+        await browser.close();
       })
-      .catch(async err => null);
+      .catch(async err => await browser.close());
   } catch (error) {
+    await browser.close();
     console.log(error);
   }
 };
