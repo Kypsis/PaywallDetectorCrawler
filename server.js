@@ -12,11 +12,11 @@ const docClient = new AWS.DynamoDB.DocumentClient();
 setInterval(() => {
   scraper("https://delfi.ee", "DelfiPaywallLinks");
   console.log("Scraping Delfi ", new Date());
-}, 300000 + Math.floor(Math.random() * 120000));
 
-setInterval(() => {
-  scraper("https://postimees.ee", "PostimeesPaywallLinks");
-  console.log("Scraping Postimees ", new Date());
+  setTimeout(() => {
+    scraper("https://postimees.ee", "PostimeesPaywallLinks");
+    console.log("Scraping Postimees ", new Date());
+  }, 150000);
 }, 300000 + Math.floor(Math.random() * 120000));
 
 app.get("/delfi", (req, res) => {
