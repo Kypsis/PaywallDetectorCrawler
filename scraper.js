@@ -127,7 +127,6 @@ const scraper = async (pageToScrape, tableName) => {
       })
       .catch(async err => await browser.close());
   } catch (error) {
-    await browser.close();
     console.log(error);
   }
 };
