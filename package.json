@@ -6,7 +6,7 @@
   "dependencies": {
     "aws-sdk": "^2.578.0",
     "axios": "^0.21.1",
-    "express": "4.16.2",
+    "express": "4.17.3",
     "puppeteer": "^2.0.0"
   },
   "devDependencies": {
